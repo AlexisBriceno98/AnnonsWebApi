@@ -25,7 +25,9 @@ namespace AnnonsWebApi.Controllers
             {
                 Id = a.Id,
                 Title = a.Title,
-                Description = a.Description
+                Description = a.Description,
+                TargetUrl = a.TargetUrl,
+                CreatedAt = a.CreatedAt
             }).ToList();
 
             return Ok(adDTOs);
@@ -68,22 +70,31 @@ namespace AnnonsWebApi.Controllers
         }
 
         [HttpPut]
-        public async Task<ActionResult<AdDTO>> UpdateAd(AdDTO adDto)
+        [Route("{id}")]
+        public async Task<ActionResult<AdUpdateDTO>> UpdateAd(AdUpdateDTO adUpdateDto, int id)
         {
-            var adToUpdate = _dbContext.AdsInfo.Find(adDto.Id);
+            var adToUpdate = _dbContext.AdsInfo.Find(id);
 
             if (adToUpdate == null)
             {
                 return BadRequest("Ad not found");
             }
 
-            adToUpdate.Title = adDto.Title;
-            adToUpdate.Description = adDto.Description;
-            adToUpdate.TargetUrl = adDto.TargetUrl;
-            adToUpdate.CreatedAt = adDto.CreatedAt;
+            adToUpdate.Title = adUpdateDto.Title;
+            adToUpdate.Description = adUpdateDto.Description;
+            adToUpdate.TargetUrl = adUpdateDto.TargetUrl;
+            adToUpdate.CreatedAt = adUpdateDto.CreatedAt;
 
             await _dbContext.SaveChangesAsync();
 
+            var adDto = new AdDTO
+            {
+                Id = adToUpdate.Id,
+                Title = adToUpdate.Title,
+                Description = adToUpdate.Description,
+                TargetUrl = adToUpdate.TargetUrl,
+                CreatedAt = adToUpdate.CreatedAt
+            };
             return Ok(adDto);
         }
 
